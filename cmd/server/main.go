@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,11 +9,18 @@ import (
 	"time"
 
 	"github.com/M-Arthur/kart-challenge/internal/config"
+	"github.com/M-Arthur/kart-challenge/internal/logger"
 	"github.com/M-Arthur/kart-challenge/internal/server"
 	"github.com/go-chi/chi"
 )
 
 func main() {
+	// 1) Init logger
+	cfg := config.Load()
+	appLogger := logger.New(cfg.AppEnv)
+
+	appLogger.Info().Str("env", cfg.AppEnv).Msg("starting server")
+
 	r := chi.NewRouter()
 
 	// Temporary health endpoint
@@ -23,33 +29,31 @@ func main() {
 		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	})
 
-	cfg := config.Load()
-	port := ":" + cfg.Port
+	addr := ":" + cfg.Port
 
-	srv := server.New(port, r)
+	srv := server.New(addr, r)
 
 	// Listen for shutdown signals
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		log.Printf("Server starting on %s...\n", port)
+		appLogger.Info().Str("addr", addr).Msg("server listening")
 		if err := srv.Start(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe error: %v", err)
+			appLogger.Fatal().Err(err).Msg("server failed")
 		}
 	}()
 
 	// Wait for signal
 	<-stop
-	log.Println("Shutting down server...")
-
+	appLogger.Info().Msg("shutdown signal received, shutting down server")
 	// Graceful shutdown context (with timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		appLogger.Error().Err(err).Msg("server forced to shutdown")
 	}
 
-	log.Println("Server exited gracefully")
+	appLogger.Info().Msg("server exited gracefully")
 }
