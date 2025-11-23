@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/M-Arthur/kart-challenge/internal/config"
+	"github.com/M-Arthur/kart-challenge/internal/server"
 	"github.com/go-chi/chi"
 )
 
@@ -25,10 +26,7 @@ func main() {
 	cfg := config.Load()
 	port := ":" + cfg.Port
 
-	srv := &http.Server{
-		Addr:    port,
-		Handler: r,
-	}
+	srv := server.New(port, r)
 
 	// Listen for shutdown signals
 	stop := make(chan os.Signal, 1)
@@ -36,7 +34,7 @@ func main() {
 
 	go func() {
 		log.Printf("Server starting on %s...\n", port)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := srv.Start(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe error: %v", err)
 		}
 	}()
