@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/M-Arthur/kart-challenge/internal/config"
+	"github.com/M-Arthur/kart-challenge/internal/httpapi"
 	"github.com/M-Arthur/kart-challenge/internal/logger"
 	"github.com/M-Arthur/kart-challenge/internal/server"
-	"github.com/go-chi/chi"
 )
 
 func main() {
@@ -21,19 +21,16 @@ func main() {
 
 	appLogger.Info().Str("env", cfg.AppEnv).Msg("starting server")
 
-	r := chi.NewRouter()
-
-	// Temporary health endpoint
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"status":"ok"}`))
+	// 2) Build router with configured routes & middleware
+	r := httpapi.NewRouter(httpapi.RouterConfig{
+		Logger: appLogger,
 	})
 
+	// 3) Server config
 	addr := ":" + cfg.Port
-
 	srv := server.New(addr, r)
 
-	// Listen for shutdown signals
+	// 4) Graceful shutdown wiring
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
