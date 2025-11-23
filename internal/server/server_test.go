@@ -64,7 +64,7 @@ func TestServer_GracefulShutdown(t *testing.T) {
 		t.Fatalf("expected graceful shutdown without error, got: %v", err)
 	}
 
-	// 3) Ensrue Start() returned (either nil or ErrServerClosed)
+	// 3) Ensure Start() returned (either nil or ErrServerClosed)
 	select {
 	case err := <-errCh:
 		// In a normal graceful shutdown, http.Server.ListenAndServe
