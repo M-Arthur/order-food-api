@@ -1,0 +1,83 @@
+# -------------------------
+# Go Build Artifacts
+# -------------------------
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build outputs
+*.test
+*.out
+
+# Go coverage files
+*.cover
+*.cov
+coverage.txt
+
+# go build cache
+/go-build/
+*.a
+
+# go vet / staticcheck / lint temp files
+*.tmp
+
+# -------------------------
+# Go Modules & Dependency Caches
+# -------------------------
+# Module cache (only if inside project; usually not needed)
+# Uncomment if you vendor or store modules inside project
+# /vendor/
+
+# Go workspace
+go.work
+go.work.sum
+
+# -------------------------
+# Development Tools
+# -------------------------
+# If using godeps
+Godeps/
+
+# Delve debugger
+__debug_bin
+
+# GoLand
+.idea/
+
+# JetBrains Goland files
+*.iml
+
+# -------------------------
+# VS Code
+# -------------------------
+.vscode/
+.vscode-test/
+
+# VS Code local history
+.history/
+
+# VS Code extensions temp
+*.code-workspace
+
+# -------------------------
+# OS / Temporary files
+# -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.log
+
+# Linux temp
+*.pid
+*.seed
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+logs/
