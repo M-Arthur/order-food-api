@@ -3,7 +3,8 @@ package httpapi
 import (
 	"net/http"
 
-	handlers "github.com/M-Arthur/kart-challenge/internal/httpapi/Handlers"
+	"github.com/M-Arthur/kart-challenge/internal/httpapi/handlers"
+	"github.com/M-Arthur/kart-challenge/internal/httpapi/middleware"
 	"github.com/go-chi/chi"
 	"github.com/rs/zerolog"
 )
@@ -18,6 +19,12 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	r := chi.NewRouter()
 
 	// --- Global middlewares ---
+	r.Use(
+		middleware.Recover(cfg.Logger),
+		middleware.JSONContentType,
+		middleware.RequestID,
+		middleware.RequestLogger(cfg.Logger),
+	)
 
 	// --- Route groups / endpoints ---
 	registerHealthRoutes(r)
