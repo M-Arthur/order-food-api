@@ -3,8 +3,8 @@ package httpapi
 import (
 	"net/http"
 
-	"github.com/M-Arthur/kart-challenge/internal/httpapi/handlers"
-	"github.com/M-Arthur/kart-challenge/internal/httpapi/middleware"
+	"github.com/M-Arthur/order-food-api/internal/httpapi/handlers"
+	"github.com/M-Arthur/order-food-api/internal/httpapi/middleware"
 	"github.com/go-chi/chi"
 	"github.com/rs/zerolog"
 )

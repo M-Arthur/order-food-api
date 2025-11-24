@@ -1,4 +1,4 @@
-module github.com/M-Arthur/kart-challenge
+module github.com/M-Arthur/order-food-api
 
 go 1.25.4
 

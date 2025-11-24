@@ -8,10 +8,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/M-Arthur/kart-challenge/internal/config"
-	"github.com/M-Arthur/kart-challenge/internal/httpapi"
-	"github.com/M-Arthur/kart-challenge/internal/logger"
-	"github.com/M-Arthur/kart-challenge/internal/server"
+	"github.com/M-Arthur/order-food-api/internal/config"
+	"github.com/M-Arthur/order-food-api/internal/httpapi"
+	"github.com/M-Arthur/order-food-api/internal/logger"
+	"github.com/M-Arthur/order-food-api/internal/server"
 )
 
 func main() {
