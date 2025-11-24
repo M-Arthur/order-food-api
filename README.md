@@ -24,7 +24,7 @@ order-food-api/
 ├── internal/
 │   ├── config/                  # Environment & configuration loading
 │   ├── domain/                  # Pure domain models (Product, Order, etc.)
-│   ├── http/                    # HTTP routes, handlers, middleware
+│   ├── httpapi/                 # HTTP routes, handlers, middleware
 │   ├── logger/                  # Structured logging (zerolog)
 │   ├── promo/                   # Promo code validation + file loading
 │   ├── server/                  # Server wrapper (start, shutdown)
@@ -60,7 +60,7 @@ order-food-api/
 - Promo code validation subsystem.  
 - Loads `couponbaseX.gz` files and validates promo codes across datasets.
 
-**internal/http**  
+**internal/httpapi**  
 - HTTP handlers, route registration, response helpers, and middleware.
 
 **internal/server**  
