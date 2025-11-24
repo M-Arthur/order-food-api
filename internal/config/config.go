@@ -3,16 +3,21 @@ package config
 import "os"
 
 type Config struct {
-	Port string
+	Port   string
+	AppEnv string
 }
 
-func Load() *Config {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+func Load() Config {
+	return Config{
+		Port:   getEnv("PORT", "8080"),
+		AppEnv: getEnv("APP_ENV", "dev"),
 	}
+}
 
-	return &Config{
-		Port: port,
+// Helper with default fallback
+func getEnv(key, def string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
 	}
+	return def
 }

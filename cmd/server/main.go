@@ -2,54 +2,55 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/M-Arthur/kart-challenge/internal/config"
-	"github.com/M-Arthur/kart-challenge/internal/server"
-	"github.com/go-chi/chi"
+	"github.com/M-Arthur/order-food-api/internal/config"
+	"github.com/M-Arthur/order-food-api/internal/httpapi"
+	"github.com/M-Arthur/order-food-api/internal/logger"
+	"github.com/M-Arthur/order-food-api/internal/server"
 )
 
 func main() {
-	r := chi.NewRouter()
+	// 1) Init logger
+	cfg := config.Load()
+	appLogger := logger.New(cfg.AppEnv)
 
-	// Temporary health endpoint
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"status":"ok"}`))
+	appLogger.Info().Str("env", cfg.AppEnv).Msg("starting server")
+
+	// 2) Build router with configured routes & middleware
+	r := httpapi.NewRouter(httpapi.RouterConfig{
+		Logger: appLogger,
 	})
 
-	cfg := config.Load()
-	port := ":" + cfg.Port
+	// 3) Server config
+	addr := ":" + cfg.Port
+	srv := server.New(addr, r)
 
-	srv := server.New(port, r)
-
-	// Listen for shutdown signals
+	// 4) Graceful shutdown wiring
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		log.Printf("Server starting on %s...\n", port)
+		appLogger.Info().Str("addr", addr).Msg("server listening")
 		if err := srv.Start(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe error: %v", err)
+			appLogger.Fatal().Err(err).Msg("server failed")
 		}
 	}()
 
 	// Wait for signal
 	<-stop
-	log.Println("Shutting down server...")
-
+	appLogger.Info().Msg("shutdown signal received, shutting down server")
 	// Graceful shutdown context (with timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		appLogger.Error().Err(err).Msg("server forced to shutdown")
 	}
 
-	log.Println("Server exited gracefully")
+	appLogger.Info().Msg("server exited gracefully")
 }

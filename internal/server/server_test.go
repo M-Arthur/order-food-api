@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/M-Arthur/kart-challenge/internal/server"
+	"github.com/M-Arthur/order-food-api/internal/server"
 	"github.com/go-chi/chi"
 )
 
