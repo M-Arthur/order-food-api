@@ -47,9 +47,9 @@ func RequestLogger(baseLogger zerolog.Logger) func(next http.Handler) http.Handl
 			if id, ok := RequestIDFrom(r.Context()); ok {
 				l = l.Str("request_id", id)
 			}
-
+			reqLogger := l.Logger()
 			// Store in context for handlers to use
-			ctx := WithLogger(r.Context(), l.Logger())
+			ctx := WithLogger(r.Context(), reqLogger)
 
 			rw := &responseWriter{
 				ResponseWriter: w,
@@ -58,7 +58,6 @@ func RequestLogger(baseLogger zerolog.Logger) func(next http.Handler) http.Handl
 
 			next.ServeHTTP(rw, r.WithContext(ctx))
 
-			reqLogger := LoggerFrom(r.Context(), baseLogger)
 			reqLogger.Info().
 				Int("status", rw.status).
 				Int("bytes", rw.bytes).
