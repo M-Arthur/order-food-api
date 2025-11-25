@@ -6,16 +6,38 @@ import (
 	"github.com/M-Arthur/order-food-api/internal/domain"
 )
 
+// ValidationError is an API-level validation error, suitable for mapping to 422.
+type ValidationError struct {
+	Field   string
+	Message string
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("%s: %s", e.Field, e.Message)
+}
+
 // MapOrderReqToDomain builds a domain.Order from the incoming OrderReqDTO.
+//
+// It performs adapter-level validation with field-specific messages, then
+// delegates to domain.NewOrder for invariant checking.
 func MapOrderReqToDomain(orderID domain.OrderID, req OrderReqDTO) (*domain.Order, error) {
 	items := make([]domain.OrderItem, 0, len(req.Items))
 
 	for i, item := range req.Items {
+		fieldProductID := fmt.Sprintf("items[%d].productId", i)
+		fieldQuantity := fmt.Sprintf("items[%d].quantity", i)
+
 		if item.ProductID == "" {
-			return nil, fmt.Errorf("items[%d].productId: required", i)
+			return nil, &ValidationError{
+				Field:   fieldProductID,
+				Message: "required",
+			}
 		}
 		if item.Quantity < 1 {
-			return nil, fmt.Errorf("items[%d].quantity: must be >= 1", i)
+			return nil, &ValidationError{
+				Field:   fieldQuantity,
+				Message: "must be >= 1",
+			}
 		}
 
 		items = append(items, domain.OrderItem{
@@ -27,7 +49,7 @@ func MapOrderReqToDomain(orderID domain.OrderID, req OrderReqDTO) (*domain.Order
 	return domain.NewOrder(orderID, items, req.CouponCode)
 }
 
-// MapDomainProductToDTO converts a domain.Product to the API representation
+// MapDomainProductToDTO converts a domain.Product to the API representation.
 func MapDomainProductToDTO(p domain.Product) ProductDTO {
 	return ProductDTO{
 		ID:       string(p.ID),
