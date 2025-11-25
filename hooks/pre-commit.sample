@@ -19,4 +19,16 @@ if [ $STATUS -ne 0 ]; then
 fi
 
 echo "golangci-lint passed."
+
+go test ./...
+TEST_STATUS=$?
+
+if [ $TEST_STATUS -ne 0 ]; then
+  echo ""
+  echo "Go tests failed. Fix issues before committing."
+  exit 1
+fi
+
+echo "go test passed."
+
 exit 0
