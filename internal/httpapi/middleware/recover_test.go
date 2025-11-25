@@ -13,6 +13,7 @@ import (
 func TestRecoverMiddleware_CatchesPanic(t *testing.T) {
 	var buf bytes.Buffer
 	baseLogger := zerolog.New(&buf).With().Timestamp().Logger()
+	zerolog.DefaultContextLogger = &baseLogger
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		panic("boom")
@@ -21,7 +22,7 @@ func TestRecoverMiddleware_CatchesPanic(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/test", nil)
 	rr := httptest.NewRecorder()
 
-	mw := Recover(baseLogger)(handler)
+	mw := Recover(handler)
 	mw.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
@@ -37,7 +38,6 @@ func TestRecoverMiddleware_CatchesPanic(t *testing.T) {
 	}
 
 	logOutput := buf.String()
-	println(logOutput)
 	if !strings.Contains(logOutput, "panic") {
 		t.Fatalf("expected panic details in log output, got: %s", logOutput)
 	}

@@ -23,6 +23,7 @@ func New(env string) zerolog.Logger {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
-	log.Logger = l // set global logger used by log package
+	zerolog.DefaultContextLogger = &l // set global default logger used when calling Ctx()
+	log.Logger = l                    // set global logger used by log package
 	return l
 }
