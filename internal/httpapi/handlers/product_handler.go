@@ -30,10 +30,10 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 	products, err := h.productSvc.ListProducts(ctx)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to list products")
-		shared.WriteJSONError(w, http.StatusInternalServerError, "intrnal server error")
+		shared.WriteJSONError(w, r, http.StatusInternalServerError, "intrnal server error")
 		return
 	}
 
 	dto := api.MapDomainProductsToDTO(products)
-	shared.WriteJSON(w, http.StatusOK, dto)
+	shared.WriteJSON(w, r, http.StatusOK, dto)
 }
