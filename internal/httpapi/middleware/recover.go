@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"github.com/M-Arthur/order-food-api/internal/httpapi/shared"
 	"github.com/rs/zerolog"
 )
 
@@ -14,7 +15,7 @@ func Recover(baseLogger zerolog.Logger) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if rec := recover(); rec != nil {
-					logger := LoggerFrom(r.Context(), baseLogger)
+					logger := shared.LoggerFrom(r.Context(), baseLogger)
 					logger.Error().
 						Interface("panic", rec).
 						Bytes("stack", debug.Stack()).

@@ -37,7 +37,6 @@ func TestRecoverMiddleware_CatchesPanic(t *testing.T) {
 	}
 
 	logOutput := buf.String()
-	println(logOutput)
 	if !strings.Contains(logOutput, "panic") {
 		t.Fatalf("expected panic details in log output, got: %s", logOutput)
 	}

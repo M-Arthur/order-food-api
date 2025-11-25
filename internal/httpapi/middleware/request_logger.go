@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/M-Arthur/order-food-api/internal/httpapi/shared"
 	"github.com/rs/zerolog"
 )
 
@@ -38,7 +39,7 @@ func RequestLogger(baseLogger zerolog.Logger) func(next http.Handler) http.Handl
 			start := time.Now()
 
 			// Start from base logger or any logger already in context
-			l := LoggerFrom(r.Context(), baseLogger).With().
+			l := shared.LoggerFrom(r.Context(), baseLogger).With().
 				Str("method", r.Method).
 				Str("path", r.URL.Path).
 				Str("remote_addr", r.RemoteAddr).
@@ -49,7 +50,7 @@ func RequestLogger(baseLogger zerolog.Logger) func(next http.Handler) http.Handl
 			}
 			reqLogger := l.Logger()
 			// Store in context for handlers to use
-			ctx := WithLogger(r.Context(), reqLogger)
+			ctx := shared.WithLogger(r.Context(), reqLogger)
 
 			rw := &responseWriter{
 				ResponseWriter: w,
