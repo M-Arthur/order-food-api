@@ -88,3 +88,11 @@ func NewOrder(id OrderID, items []OrderItem, couponCode *string) (*Order, error)
 		CouponCode: couponCode,
 	}, nil
 }
+
+// ProductRepository is the hexagonal port for accessing products.
+//
+// Adapters (in-memory, DB, etc.) live outside domain and implement this.
+type ProductRepository interface {
+	ListProducts() ([]Product, error)
+	GetProductByID(id ProductID) (*Product, error)
+}
