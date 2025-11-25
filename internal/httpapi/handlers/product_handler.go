@@ -25,7 +25,7 @@ func NewProductHandler(productSvc service.ProductService, l zerolog.Logger) *Pro
 // ListProducts handles GET /product.
 func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	logger := shared.LoggerFrom(ctx, h.logger)
+	logger := zerolog.Ctx(ctx)
 
 	products, err := h.productSvc.ListProducts(ctx)
 	if err != nil {

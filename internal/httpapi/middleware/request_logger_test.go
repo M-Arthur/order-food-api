@@ -40,6 +40,7 @@ func (w *jsonCapturingWriter) Write(p []byte) (int, error) {
 func TestRequestLogger_LogRequest(t *testing.T) {
 	writer := newJSONCapturingWriter()
 	baseLogger := zerolog.New(writer).With().Timestamp().Logger()
+	zerolog.DefaultContextLogger = &baseLogger
 
 	handlerCalled := false
 
@@ -55,7 +56,7 @@ func TestRequestLogger_LogRequest(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/test", nil)
 	rr := httptest.NewRecorder()
 
-	mw := RequestLogger(baseLogger)(handler)
+	mw := RequestLogger(handler)
 	mw.ServeHTTP(rr, req)
 
 	if !handlerCalled {

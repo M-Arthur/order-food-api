@@ -23,10 +23,10 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// --- Global middlewares ---
 	r.Use(
-		middleware.Recover(cfg.Logger),
+		middleware.Recover,
 		middleware.JSONContentType,
 		middleware.RequestID,
-		middleware.RequestLogger(cfg.Logger),
+		middleware.RequestLogger,
 	)
 
 	// --- Route groups / endpoints ---

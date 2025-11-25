@@ -92,6 +92,7 @@ func TestProductHandler_ListProducts_Error(t *testing.T) {
 	}
 	var buf bytes.Buffer
 	baseLogger := zerolog.New(&buf).With().Timestamp().Logger()
+	zerolog.DefaultContextLogger = &baseLogger
 
 	svc := &stubProductService{products: seed, err: errors.New("test error")}
 	h := handlers.NewProductHandler(svc, baseLogger)
