@@ -1,13 +1,14 @@
 package api_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/M-Arthur/order-food-api/internal/api"
 	"github.com/M-Arthur/order-food-api/internal/domain"
 )
 
-func TestMapOrderReqToDomain_Succes(t *testing.T) {
+func TestMapOrderReqToDomain_Success(t *testing.T) {
 	req := api.OrderReqDTO{
 		CouponCode: ptr("PROMO10"),
 		Items: []api.OrderItemDTO{
@@ -48,9 +49,12 @@ func TestMapOrderReqToDomain_Succes(t *testing.T) {
 
 func TestMapOrderReqToDomain_ValidationErrors(t *testing.T) {
 	tests := []struct {
-		name    string
-		req     api.OrderReqDTO
-		wantErr bool
+		name          string
+		req           api.OrderReqDTO
+		wantErr       bool
+		wantField     string
+		wantMessage   string
+		wantDomainErr error
 	}{
 		{
 			name: "missing product id",
@@ -59,7 +63,9 @@ func TestMapOrderReqToDomain_ValidationErrors(t *testing.T) {
 					{ProductID: "", Quantity: 1},
 				},
 			},
-			wantErr: true,
+			wantErr:     true,
+			wantField:   "items[0].productId",
+			wantMessage: "required",
 		},
 		{
 			name: "invalid quantity",
@@ -68,14 +74,17 @@ func TestMapOrderReqToDomain_ValidationErrors(t *testing.T) {
 					{ProductID: "p1", Quantity: 0},
 				},
 			},
-			wantErr: true,
+			wantErr:     true,
+			wantField:   "items[0].quantity",
+			wantMessage: "must be >= 1",
 		},
 		{
 			name: "empty items - domain will reject",
 			req: api.OrderReqDTO{
 				Items: nil,
 			},
-			wantErr: true,
+			wantErr:       true,
+			wantDomainErr: domain.ErrEmptyOrderItems,
 		},
 	}
 
@@ -83,7 +92,34 @@ func TestMapOrderReqToDomain_ValidationErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := api.MapOrderReqToDomain(domain.OrderID("order-1"), tt.req)
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("MapOrerReqToDomain() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("MapOrderReqToDomain() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if !tt.wantErr {
+				if err != nil {
+					t.Fatalf("did not expect error, got %v", err)
+				}
+				return
+			}
+
+			// If we expect a ValidationError (field + message).
+			if tt.wantField != "" {
+				var ve *api.ValidationError
+				if !errors.As(err, &ve) {
+					t.Fatalf("expected ValidationError, got %T (%v)", err, err)
+				}
+				if ve.Field != tt.wantField {
+					t.Errorf("ValidationError.Field = %q, want %q", ve.Field, tt.wantField)
+				}
+				if ve.Message != tt.wantMessage {
+					t.Errorf("ValidationError.Message = %q, want %q", ve.Message, tt.wantMessage)
+				}
+				return
+			}
+
+			// If we expect a specific domain error.
+			if tt.wantDomainErr != nil && !errors.Is(err, tt.wantDomainErr) {
+				t.Fatalf("expected error %v, got %v", tt.wantDomainErr, err)
 			}
 		})
 	}
@@ -158,10 +194,10 @@ func TestMapDomainOrderToDTO(t *testing.T) {
 			t.Errorf("products[%d].Name = %s, want %s", i, p.Name, want.Name)
 		}
 		if p.Category != want.Category {
-			t.Errorf("dto.Category = %s, want %s", p.Category, want.Category)
+			t.Errorf("products[%d].Category = %s, want %s", i, p.Category, want.Category)
 		}
 		if p.Price != want.Price.ToFloat() {
-			t.Errorf("dto.Price = %v, want %v", p.Price, want.Price.ToFloat())
+			t.Errorf("products[%d].Price = %v, want %v", i, p.Price, want.Price.ToFloat())
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package domain_test
 
 import (
+	"math"
 	"testing"
 
 	"github.com/M-Arthur/order-food-api/internal/domain"
@@ -18,13 +19,14 @@ func TestNewMoney_FromFloatAndToFloat(t *testing.T) {
 			expected: domain.Money(1234),
 		},
 		{
-			name:     "rounding_half_up",
-			input:    1.005, // 1.005 * 100 = 100.5 -> 1010 - banker's round
-			expected: domain.Money(100),
+			name:     "rounding_half_away_from_zero",
+			input:    1.005,
+			expected: domain.Money(100), // banker's round
 		},
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			m := domain.NewMoneyFromFloat(tt.input)
 			if m != tt.expected {
@@ -32,8 +34,9 @@ func TestNewMoney_FromFloatAndToFloat(t *testing.T) {
 			}
 
 			back := m.ToFloat()
-			if m != 0 && back == 0 {
-				t.Fatalf("ToFloat returned 0 for %v", m)
+			// Allow for tiny float errors on the round-trip.
+			if diff := math.Abs(back - float64(m)/100); diff > 1e-9 {
+				t.Fatalf("ToFloat round-trip mismatch: got %v, want %v (diff=%v)", back, float64(m)/100, diff)
 			}
 		})
 	}
@@ -67,9 +70,15 @@ func TestNewOrder_Success(t *testing.T) {
 	if order.CouponCode == nil || *order.CouponCode != coupon {
 		t.Fatalf("order.CouponCode = %v, want %s", order.CouponCode, coupon)
 	}
+
+	// Ensure NewOrder defensively copies the items slice.
+	items[0].Quantity = 999
+	if order.Items[0].Quantity == 999 {
+		t.Fatalf("order.Items was mutated after NewOrder; expected defensive copy")
+	}
 }
 
-func TestNewOrder_ValidationErors(t *testing.T) {
+func TestNewOrder_ValidationErrors(t *testing.T) {
 	tests := []struct {
 		name      string
 		orderID   domain.OrderID
