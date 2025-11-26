@@ -94,5 +94,10 @@ func NewOrder(id OrderID, items []OrderItem, couponCode *string) (*Order, error)
 // Adapters (in-memory, DB, etc.) live outside domain and implement this.
 type ProductRepository interface {
 	ListProducts() ([]Product, error)
+
+	// GetProductByID returns the product base on given ID
+	//
+	// domain.ErrProductNotFound should be returned when no product can be found
+	// based on the given ID
 	GetProductByID(id ProductID) (*Product, error)
 }
