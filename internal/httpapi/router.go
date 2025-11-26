@@ -3,11 +3,9 @@ package httpapi
 import (
 	"net/http"
 
-	"github.com/M-Arthur/order-food-api/internal/domain"
+	"github.com/M-Arthur/order-food-api/internal/bootstrap"
 	"github.com/M-Arthur/order-food-api/internal/httpapi/handlers"
 	"github.com/M-Arthur/order-food-api/internal/httpapi/middleware"
-	"github.com/M-Arthur/order-food-api/internal/service"
-	"github.com/M-Arthur/order-food-api/internal/storage"
 	"github.com/go-chi/chi"
 	"github.com/rs/zerolog"
 )
@@ -15,6 +13,7 @@ import (
 // RouterConfig centralises configration for the router
 type RouterConfig struct {
 	Logger zerolog.Logger
+	Deps   *bootstrap.Dependencies
 }
 
 // NewRouter builds the HTTP router with middleware and routes
@@ -30,26 +29,9 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	)
 
 	// --- Route groups / endpoints ---
-	registerHealthRoutes(r)
-	registerProductRoutes(r)
+	r.Get("/health", handlers.Health)
+	r.Get("/product", cfg.Deps.Handlers.Product.ListProducts)
+	r.Get("/product/{productId}", cfg.Deps.Handlers.Product.GetProductByID)
 
 	return r
-}
-
-// registerHealthRoutes sets up health check endpoints
-func registerHealthRoutes(r chi.Router) {
-	r.Get("/health", handlers.Health)
-}
-
-func registerProductRoutes(r chi.Router) {
-	seedProducts := []domain.Product{
-		{ID: domain.ProductID("10"), Name: "Chicken Waffle", Price: domain.NewMoneyFromFloat(12.5), Category: "Waffle"},
-		{ID: domain.ProductID("11"), Name: "Fries", Price: domain.NewMoneyFromFloat(5.5), Category: "Sides"},
-	}
-	productRepo := storage.NewInMemoryProductRepository(seedProducts)
-	productSvc := service.NewProductService(productRepo)
-	productHandler := handlers.NewProductHandler(productSvc)
-
-	r.Get("/product", productHandler.ListProducts)
-	r.Get("/product/{productId}", productHandler.GetProductByID)
 }
