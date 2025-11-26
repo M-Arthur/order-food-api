@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog"
 )
 
@@ -43,7 +44,8 @@ func RequestLogger(next http.Handler) http.Handler {
 			Str("remote_addr", r.RemoteAddr).
 			Str("user_agent", r.UserAgent())
 
-		if id, ok := RequestIDFrom(r.Context()); ok {
+		id := chimiddleware.GetReqID(r.Context())
+		if id != "" {
 			l = l.Str("request_id", id)
 		}
 		reqLogger := l.Logger()

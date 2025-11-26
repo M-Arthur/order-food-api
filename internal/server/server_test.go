@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/M-Arthur/order-food-api/internal/server"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 )
 
 func findFreePort(t *testing.T) string {
