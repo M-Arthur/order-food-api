@@ -7,6 +7,7 @@ import (
 	"github.com/M-Arthur/order-food-api/internal/httpapi/handlers"
 	"github.com/M-Arthur/order-food-api/internal/httpapi/middleware"
 	"github.com/go-chi/chi"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog"
 )
 
@@ -22,6 +23,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// --- Global middlewares ---
 	r.Use(
+		chimiddleware.RedirectSlashes,
 		middleware.LoggerMiddleware(cfg.Logger),
 		middleware.Recover,
 		middleware.JSONContentType,
