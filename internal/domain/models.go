@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math"
@@ -100,4 +101,8 @@ type ProductRepository interface {
 	// domain.ErrProductNotFound should be returned when no product can be found
 	// based on the given ID
 	GetProductByID(id ProductID) (*Product, error)
+}
+
+type OrderRepository interface {
+	Save(ctx context.Context, order *Order) error
 }
