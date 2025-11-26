@@ -32,7 +32,7 @@ func (s *orderService) CreateOrder(
 	// 1. Validate product existence and collect domain.Product
 	var products []domain.Product
 	for _, item := range input.Items {
-		p, err := s.productRepo.GetProductByID(item.ProductID)
+		p, err := s.productRepo.GetProductByID(ctx, item.ProductID)
 		if err != nil {
 			if errors.Is(err, domain.ErrProductNotFound) {
 				return nil, nil, fmt.Errorf("product %s does not exist: %w", item.ProductID, domain.ErrProductNotFound)
