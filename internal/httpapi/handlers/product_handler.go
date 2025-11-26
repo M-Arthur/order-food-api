@@ -9,7 +9,7 @@ import (
 	"github.com/M-Arthur/order-food-api/internal/domain"
 	"github.com/M-Arthur/order-food-api/internal/httpapi/shared"
 	"github.com/M-Arthur/order-food-api/internal/service"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 )
 
