@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/M-Arthur/order-food-api/internal/bootstrap"
 	"github.com/M-Arthur/order-food-api/internal/config"
 	"github.com/M-Arthur/order-food-api/internal/httpapi"
 	"github.com/M-Arthur/order-food-api/internal/logger"
@@ -18,12 +19,19 @@ func main() {
 	// 1) Init logger
 	cfg := config.Load()
 	appLogger := logger.New(cfg.AppEnv)
+	appLogger.Info().Msg("initiating server")
 
-	appLogger.Info().Str("env", cfg.AppEnv).Msg("starting server")
+	deps, err := bootstrap.BuildDependencies(cfg)
+	if err != nil {
+		appLogger.Fatal().Err(err).Msg("loading dependencies unsuccessfully")
+	}
+
+	appLogger.Info().Msg("starting server")
 
 	// 2) Build router with configured routes & middleware
 	r := httpapi.NewRouter(httpapi.RouterConfig{
 		Logger: appLogger,
+		Deps:   deps,
 	})
 
 	// 3) Server config
@@ -49,7 +57,7 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		appLogger.Error().Err(err).Msg("server forced to shutdown")
+		appLogger.Fatal().Err(err).Msg("server forced to shutdown")
 	}
 
 	appLogger.Info().Msg("server exited gracefully")
