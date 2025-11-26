@@ -44,6 +44,12 @@ CREATE TABLE order_items (
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items (order_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items (product_id);
 
+INSERT INTO products (id, name, price_cents, category) VALUES
+('10', 'Chicken Waffle', 1250, 'Waffle'),
+('11', 'Fries', 550, 'Sides'),
+('12', 'Soda', 300, 'Beverages'),
+('13', 'Burger', 1500, 'Main Course'),
+('14', 'Salad', 800, 'Appetizers');
 -- Optional: seed data example (remove if you don't want sample rows)
 -- INSERT INTO orders (id, coupon_code) VALUES ('order-seed-1', NULL);
 -- INSERT INTO order_items (order_id, product_id, quantity)
