@@ -31,7 +31,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// --- Route groups / endpoints ---
 	registerHealthRoutes(r)
-	registerProductRoutes(r, cfg.Logger)
+	registerProductRoutes(r)
 
 	return r
 }
@@ -41,14 +41,15 @@ func registerHealthRoutes(r chi.Router) {
 	r.Get("/health", handlers.Health)
 }
 
-func registerProductRoutes(r chi.Router, l zerolog.Logger) {
+func registerProductRoutes(r chi.Router) {
 	seedProducts := []domain.Product{
 		{ID: domain.ProductID("10"), Name: "Chicken Waffle", Price: domain.NewMoneyFromFloat(12.5), Category: "Waffle"},
 		{ID: domain.ProductID("11"), Name: "Fries", Price: domain.NewMoneyFromFloat(5.5), Category: "Sides"},
 	}
 	productRepo := storage.NewInMemoryProductRepository(seedProducts)
 	productSvc := service.NewProductService(productRepo)
-	productHandler := handlers.NewProductHandler(productSvc, l)
+	productHandler := handlers.NewProductHandler(productSvc)
 
 	r.Get("/product", productHandler.ListProducts)
+	r.Get("/product/{productId}", productHandler.GetProductByID)
 }
