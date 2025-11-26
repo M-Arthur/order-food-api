@@ -1,0 +1,69 @@
+# -----------------------------
+# Go build artifacts
+# -----------------------------
+/bin/
+/build/
+/dist/
+/out/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Go modules cache
+/pkg/mod/
+#/pkg/ (optional — only exclude if large)
+
+# Dependency management files not needed for build
+go.work
+go.work.sum
+
+# -----------------------------
+# Git
+# -----------------------------
+.git
+.gitignore
+.gitattributes
+
+# -----------------------------
+# Editors / IDEs
+# -----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------
+# OS / system files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Logs, temp, misc
+# -----------------------------
+*.log
+*.tmp
+*.cache
+
+# -----------------------------
+# Docker files
+# -----------------------------
+Dockerfile*
+docker-compose*
+.env*
+
+# -----------------------------
+# Application-specific exclusions
+# -----------------------------
+# Test data or fixtures (optional)
+testdata/
+*.pem
+*.key
+*.cert
+*.envrc
+coverage.out
+hooks/
+deploy/
+README.md
