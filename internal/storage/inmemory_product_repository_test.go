@@ -1,6 +1,7 @@
 package storage_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/M-Arthur/order-food-api/internal/domain"
@@ -23,7 +24,7 @@ func TestInMemoryProductRepository_GetProductByID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, err := repo.GetProductByID(tt.id)
+			p, err := repo.GetProductByID(context.Background(), tt.id)
 
 			if tt.wantErr {
 				if err == nil {
@@ -54,7 +55,7 @@ func TestInMemoryProductRepository_ListProducts(t *testing.T) {
 		{ID: "11", Name: "Vegan Waffle", Price: domain.NewMoneyFromFloat(11.0), Category: "Waffle"},
 	})
 
-	list, err := repo.ListProducts()
+	list, err := repo.ListProducts(context.Background())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

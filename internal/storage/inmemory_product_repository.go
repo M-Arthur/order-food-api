@@ -1,6 +1,10 @@
 package storage
 
-import "github.com/M-Arthur/order-food-api/internal/domain"
+import (
+	"context"
+
+	"github.com/M-Arthur/order-food-api/internal/domain"
+)
 
 // InMemoryProductRepository is an adapter implementing domain.ProductRepository.
 //
@@ -19,7 +23,7 @@ func NewInMemoryProductRepository(seed []domain.Product) domain.ProductRepositor
 	}
 }
 
-func (r *InMemoryProductRepository) ListProducts() ([]domain.Product, error) {
+func (r *InMemoryProductRepository) ListProducts(_ context.Context) ([]domain.Product, error) {
 	out := make([]domain.Product, 0, len(r.products))
 	for _, p := range r.products {
 		out = append(out, p)
@@ -27,7 +31,7 @@ func (r *InMemoryProductRepository) ListProducts() ([]domain.Product, error) {
 	return out, nil
 }
 
-func (r *InMemoryProductRepository) GetProductByID(id domain.ProductID) (*domain.Product, error) {
+func (r *InMemoryProductRepository) GetProductByID(_ context.Context, id domain.ProductID) (*domain.Product, error) {
 	p, ok := r.products[id]
 	if !ok {
 		return nil, domain.ErrProductNotFound

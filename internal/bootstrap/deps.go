@@ -83,11 +83,7 @@ func buildInfra(c config.Config) (*Infra, error) {
 
 func buildRepos(inf Infra) Repos {
 	// Product repo
-	seedProducts := []domain.Product{
-		{ID: domain.ProductID("10"), Name: "Chicken Waffle", Price: domain.NewMoneyFromFloat(12.5), Category: "Waffle"},
-		{ID: domain.ProductID("11"), Name: "Fries", Price: domain.NewMoneyFromFloat(5.5), Category: "Sides"},
-	}
-	pr := storage.NewInMemoryProductRepository(seedProducts)
+	pr := storage.NewPgProductRepository(inf.DB)
 
 	// Order repo
 	or := storage.NewPgOrderRepository(inf.DB)

@@ -24,9 +24,9 @@ func NewProductService(repo domain.ProductRepository) ProductService {
 
 func (s *productService) ListProducts(ctx context.Context) ([]domain.Product, error) {
 	// Business logic would go here in future (filtering, sorting, etc.)
-	return s.repo.ListProducts()
+	return s.repo.ListProducts(ctx)
 }
 
 func (s *productService) GetProduct(ctx context.Context, id domain.ProductID) (*domain.Product, error) {
-	return s.repo.GetProductByID(id)
+	return s.repo.GetProductByID(ctx, id)
 }
