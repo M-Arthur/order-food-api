@@ -60,5 +60,9 @@ func main() {
 		appLogger.Fatal().Err(err).Msg("server forced to shutdown")
 	}
 
+	if err := deps.Infra.DB.Close(); err != nil {
+		appLogger.Error().Err(err).Msg("error closing DB")
+	}
+
 	appLogger.Info().Msg("server exited gracefully")
 }
