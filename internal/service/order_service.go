@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/M-Arthur/order-food-api/internal/domain"
@@ -30,22 +29,31 @@ func (s *orderService) CreateOrder(
 	items []domain.OrderItem,
 	couponCode *string,
 ) (*domain.Order, []domain.Product, error) {
-	// 1. Validate product existence and collect domain.Product
-	var products []domain.Product
+	// 1. Collect unique product IDs from the order items
+	uniqueIDsMap := make(map[domain.ProductID]struct{})
 	for _, item := range items {
-		p, err := s.productRepo.GetProductByID(ctx, item.ProductID)
-		if err != nil {
-			if errors.Is(err, domain.ErrProductNotFound) {
-				return nil, nil, fmt.Errorf("product %s does not exist: %w", item.ProductID, domain.ErrProductNotFound)
-			}
-
-			return nil, nil, fmt.Errorf("lookup product %s failed: %w", item.ProductID, err)
-		}
-
-		products = append(products, *p)
+		uniqueIDsMap[item.ProductID] = struct{}{}
 	}
 
-	// 2. Create new OrderID
+	uniqueIDs := make([]domain.ProductID, 0, len(uniqueIDsMap))
+	for id := range uniqueIDsMap {
+		uniqueIDs = append(uniqueIDs, id)
+	}
+
+	// 2. Batch fetch from product repo
+	productsByID, err := s.productRepo.GetProductByIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, nil, fmt.Errorf("lookup products for order: %w", err)
+	}
+
+	// 3. Ensure all products exist
+	for _, item := range items {
+		if _, ok := productsByID[item.ProductID]; !ok {
+			return nil, nil, fmt.Errorf("product %s does not exist: %w", item.ProductID, err)
+		}
+	}
+
+	// 4. Generate a new OrderID
 	newOrderID := domain.OrderID(uuid.NewString())
 
 	order, err := domain.NewOrder(newOrderID, items, couponCode)
@@ -53,9 +61,18 @@ func (s *orderService) CreateOrder(
 		return nil, nil, err
 	}
 
-	// 3. Persist into DB
+	// 5. Persist into DB
 	if err := s.orderRepo.Save(ctx, order); err != nil {
 		return nil, nil, fmt.Errorf("persist order: %w", err)
+	}
+
+	// 6. Prepare the slice of products in a consistent order
+	products := make([]domain.Product, 0, len(productsByID))
+	for _, item := range items {
+		// This preserves the order as used in the request
+		if p, ok := productsByID[item.ProductID]; ok {
+			products = append(products, p)
+		}
 	}
 
 	return order, products, nil

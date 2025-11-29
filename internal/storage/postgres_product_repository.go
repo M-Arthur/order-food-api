@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/M-Arthur/order-food-api/internal/domain"
+	"github.com/lib/pq"
 )
 
 type PgProductRepository struct {
@@ -92,4 +93,58 @@ func (r *PgProductRepository) GetProductByID(ctx context.Context, id domain.Prod
 		Category: category,
 	}
 	return p, nil
+}
+
+func (r *PgProductRepository) GetProductByIDs(ctx context.Context, ids []domain.ProductID) (map[domain.ProductID]domain.Product, error) {
+	if len(ids) == 0 {
+		return map[domain.ProductID]domain.Product{}, nil
+	}
+
+	idStrings := make([]string, 0, len(ids))
+	for _, id := range ids {
+		idStrings = append(idStrings, string(id))
+	}
+
+	const query = `
+		SELECT id, name, price_cents, categroy
+		FROM products
+		WHERE id = ANY($1)
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, pq.Array(idStrings))
+	if err != nil {
+		return nil, fmt.Errorf("get products by ids: %w", err)
+	}
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	result := make(map[domain.ProductID]domain.Product, len(ids))
+
+	for rows.Next() {
+		var (
+			rawID      string
+			name       string
+			priceCents int64
+			category   string
+		)
+
+		if err := rows.Scan(&rawID, &name, &priceCents, &category); err != nil {
+			return nil, fmt.Errorf("scan product row: %w", err)
+		}
+
+		p := domain.Product{
+			ID:       domain.ProductID(rawID),
+			Name:     name,
+			Price:    domain.Money(priceCents),
+			Category: category,
+		}
+		result[p.ID] = p
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate product row %w", err)
+	}
+
+	return result, nil
 }

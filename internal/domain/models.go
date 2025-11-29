@@ -101,6 +101,7 @@ type ProductRepository interface {
 	// domain.ErrProductNotFound should be returned when no product can be found
 	// based on the given ID
 	GetProductByID(ctx context.Context, id ProductID) (*Product, error)
+	GetProductByIDs(ctx context.Context, ids []ProductID) (map[ProductID]Product, error)
 }
 
 type OrderRepository interface {
