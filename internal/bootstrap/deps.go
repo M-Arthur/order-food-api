@@ -106,7 +106,7 @@ func buildServices(r Repos) Services {
 
 func buildHandlers(svc Services) Handlers {
 	ph := handlers.NewProductHandler(svc.Product)
-	oh := handlers.NewOrderHandler(svc.Order, svc.Product)
+	oh := handlers.NewOrderHandler(svc.Order)
 
 	return Handlers{
 		Product: ph,

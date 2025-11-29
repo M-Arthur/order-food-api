@@ -10,7 +10,7 @@ import (
 )
 
 type OrderService interface {
-	CreateOrder(ctx context.Context, order *domain.Order) (*domain.Order, []domain.Product, error)
+	CreateOrder(ctx context.Context, items []domain.OrderItem, couponCode *string) (*domain.Order, []domain.Product, error)
 }
 
 type orderService struct {
@@ -27,11 +27,12 @@ func NewOrderService(orderRepo domain.OrderRepository, productRepo domain.Produc
 
 func (s *orderService) CreateOrder(
 	ctx context.Context,
-	input *domain.Order,
+	items []domain.OrderItem,
+	couponCode *string,
 ) (*domain.Order, []domain.Product, error) {
 	// 1. Validate product existence and collect domain.Product
 	var products []domain.Product
-	for _, item := range input.Items {
+	for _, item := range items {
 		p, err := s.productRepo.GetProductByID(ctx, item.ProductID)
 		if err != nil {
 			if errors.Is(err, domain.ErrProductNotFound) {
@@ -47,7 +48,7 @@ func (s *orderService) CreateOrder(
 	// 2. Create new OrderID
 	newOrderID := domain.OrderID(uuid.NewString())
 
-	order, err := domain.NewOrder(newOrderID, input.Items, input.CouponCode)
+	order, err := domain.NewOrder(newOrderID, items, couponCode)
 	if err != nil {
 		return nil, nil, err
 	}
