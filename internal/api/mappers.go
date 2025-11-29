@@ -16,26 +16,26 @@ func (e *ValidationError) Error() string {
 	return fmt.Sprintf("%s: %s", e.Field, e.Message)
 }
 
-// MapOrderReqToDomain builds a domain.Order from the incoming OrderReqDTO.
-//
-// It performs adapter-level validation with field-specific messages, then
-// delegates to domain.NewOrder for invariant checking.
-func MapOrderReqToDomain(orderID domain.OrderID, req OrderReqDTO) (*domain.Order, error) {
+// OrderPayload is a helper struct used between adapter and service layers.
+type OrderPayload struct {
+	Items      []domain.OrderItem
+	CouponCode *string
+}
+
+// MapOrderReqToPayload validates the request and returns domain-friendly data.
+func MapOrderReqToPayload(req OrderReqDTO) (*OrderPayload, error) {
 	items := make([]domain.OrderItem, 0, len(req.Items))
 
 	for i, item := range req.Items {
-		fieldProductID := fmt.Sprintf("items[%d].productId", i)
-		fieldQuantity := fmt.Sprintf("items[%d].quantity", i)
-
 		if item.ProductID == "" {
 			return nil, &ValidationError{
-				Field:   fieldProductID,
+				Field:   fmt.Sprintf("items[%d].productId", i),
 				Message: "required",
 			}
 		}
 		if item.Quantity < 1 {
 			return nil, &ValidationError{
-				Field:   fieldQuantity,
+				Field:   fmt.Sprintf("items[%d].quantity", i),
 				Message: "must be >= 1",
 			}
 		}
@@ -46,7 +46,10 @@ func MapOrderReqToDomain(orderID domain.OrderID, req OrderReqDTO) (*domain.Order
 		})
 	}
 
-	return domain.NewOrder(orderID, items, req.CouponCode)
+	return &OrderPayload{
+		Items:      items,
+		CouponCode: req.CouponCode,
+	}, nil
 }
 
 // MapDomainProductToDTO converts a domain.Product to the API representation.

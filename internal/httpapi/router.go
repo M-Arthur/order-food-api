@@ -37,6 +37,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	r.Get("/health", handlers.Health)
 	r.Get("/product", cfg.Deps.Handlers.Product.ListProducts)
 	r.Get("/product/{productId}", cfg.Deps.Handlers.Product.GetProductByID)
+	r.Post("/order", cfg.Deps.Handlers.Order.PlaceOrder)
 
 	return r
 }

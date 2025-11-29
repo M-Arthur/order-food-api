@@ -8,7 +8,7 @@ import (
 	"github.com/M-Arthur/order-food-api/internal/domain"
 )
 
-func TestMapOrderReqToDomain_Success(t *testing.T) {
+func TestMapOrderReqToPayload_Success(t *testing.T) {
 	req := api.OrderReqDTO{
 		CouponCode: ptr("PROMO10"),
 		Items: []api.OrderItemDTO{
@@ -17,26 +17,20 @@ func TestMapOrderReqToDomain_Success(t *testing.T) {
 		},
 	}
 
-	orderID := domain.OrderID("order-123")
-
-	order, err := api.MapOrderReqToDomain(orderID, req)
+	payload, err := api.MapOrderReqToPayload(req)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	if orderID != order.ID {
-		t.Fatalf("order.ID = %s, want %s", order.ID, orderID)
+	if len(payload.Items) != len(req.Items) {
+		t.Fatalf("order.Items len = %d, want %d", len(payload.Items), len(req.Items))
 	}
 
-	if len(order.Items) != len(req.Items) {
-		t.Fatalf("order.Items len = %d, want %d", len(order.Items), len(req.Items))
+	if payload.CouponCode == nil || *payload.CouponCode != *req.CouponCode {
+		t.Fatalf("order.CouponCode = %v, want %s", payload.CouponCode, *req.CouponCode)
 	}
 
-	if order.CouponCode == nil || *order.CouponCode != *req.CouponCode {
-		t.Fatalf("order.CouponCode = %v, want %s", order.CouponCode, *req.CouponCode)
-	}
-
-	for i, item := range order.Items {
+	for i, item := range payload.Items {
 		want := req.Items[i]
 		if string(item.ProductID) != want.ProductID {
 			t.Errorf("item[%d].ProductID = %s, want %s", i, item.ProductID, want.ProductID)
@@ -47,7 +41,7 @@ func TestMapOrderReqToDomain_Success(t *testing.T) {
 	}
 }
 
-func TestMapOrderReqToDomain_ValidationErrors(t *testing.T) {
+func TestMapOrderReqToPayload_ValidationErrors(t *testing.T) {
 	tests := []struct {
 		name          string
 		req           api.OrderReqDTO
@@ -78,21 +72,13 @@ func TestMapOrderReqToDomain_ValidationErrors(t *testing.T) {
 			wantField:   "items[0].quantity",
 			wantMessage: "must be >= 1",
 		},
-		{
-			name: "empty items - domain will reject",
-			req: api.OrderReqDTO{
-				Items: nil,
-			},
-			wantErr:       true,
-			wantDomainErr: domain.ErrEmptyOrderItems,
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := api.MapOrderReqToDomain(domain.OrderID("order-1"), tt.req)
+			_, err := api.MapOrderReqToPayload(tt.req)
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("MapOrderReqToDomain() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("MapOrderReqToPayload() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if !tt.wantErr {
