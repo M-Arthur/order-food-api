@@ -25,7 +25,6 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	// --- Global middlewares ---
 	r.Use(
 		chimiddleware.StripSlashes,
-		chimiddleware.SupressNotFound(r),
 		chimiddleware.RequestID,
 		chimiddleware.RealIP,
 		middleware.LoggerMiddleware(cfg.Logger),

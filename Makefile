@@ -1,5 +1,11 @@
 run:
-	go run ./cmd/server
+	docker compose -f deploy/docker-compose.yml up --build
+
+build:
+	docker compose build
+
+destroy:
+	docker compose -f deploy/docker-compose.yml down --volumes --remove-orphans
 
 test:
 	go test ./...
@@ -9,6 +15,3 @@ tidy:
 
 lint:
 	golangci-lint run
-
-build:
-	go build -o bin/server ./cmd/server
