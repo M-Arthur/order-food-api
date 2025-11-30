@@ -10,6 +10,7 @@ type Config struct {
 	Port   string
 	AppEnv string
 	DB     DB
+	APIKey string
 }
 
 type DB struct {
@@ -29,6 +30,7 @@ func Load() Config {
 			MaxIdleConns: envInt("DB_MAX_IDLE_CONNS", 5),
 			MaxLifetime:  envInt64("DB_MAX_LIFETIME", int64(30*time.Minute)),
 		},
+		APIKey: envString("API_KEY", "apitest"),
 	}
 }
 

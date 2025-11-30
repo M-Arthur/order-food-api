@@ -15,6 +15,7 @@ import (
 type RouterConfig struct {
 	Logger zerolog.Logger
 	Deps   *bootstrap.Dependencies
+	APIKey string
 }
 
 // NewRouter builds the HTTP router with middleware and routes
@@ -35,9 +36,12 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// --- Route groups / endpoints ---
 	r.Get("/health", handlers.Health)
-	r.Get("/product", cfg.Deps.Handlers.Product.ListProducts)
-	r.Get("/product/{productId}", cfg.Deps.Handlers.Product.GetProductByID)
-	r.Post("/order", cfg.Deps.Handlers.Order.PlaceOrder)
+
+	r.Route("/api", func(api chi.Router) {
+		api.Get("/product", cfg.Deps.Handlers.Product.ListProducts)
+		api.Get("/product/{productId}", cfg.Deps.Handlers.Product.GetProductByID)
+		api.With(middleware.APIKeyAuth(cfg.APIKey)).Post("/order", cfg.Deps.Handlers.Order.PlaceOrder)
+	})
 
 	return r
 }

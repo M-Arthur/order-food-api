@@ -32,6 +32,7 @@ func main() {
 	r := httpapi.NewRouter(httpapi.RouterConfig{
 		Logger: appLogger,
 		Deps:   deps,
+		APIKey: cfg.APIKey,
 	})
 
 	// 3) Server config
