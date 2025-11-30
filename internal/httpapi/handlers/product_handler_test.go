@@ -21,6 +21,7 @@ import (
 // stubProductService implemnets service.ProductService for tests
 type stubProductService struct {
 	products map[domain.ProductID]domain.Product
+	seed     []domain.Product
 	err      error
 }
 
@@ -31,16 +32,13 @@ func newStubProductService(seed []domain.Product, err error) *stubProductService
 	}
 	return &stubProductService{
 		products: products,
+		seed:     seed,
 		err:      err,
 	}
 }
 
 func (s *stubProductService) ListProducts(_ context.Context) ([]domain.Product, error) {
-	out := make([]domain.Product, 0, len(s.products))
-	for _, p := range s.products {
-		out = append(out, p)
-	}
-	return out, s.err
+	return s.seed, s.err
 }
 
 func (s *stubProductService) GetProduct(_ context.Context, id domain.ProductID) (*domain.Product, error) {
