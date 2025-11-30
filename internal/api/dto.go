@@ -1,8 +1,9 @@
 package api
 
-// These types are 1:1 with the given OpenAPI schemas
-
 // ProductDTO matches components.schemas.Product exactly.
+// @Description Product model
+// @Name Product
+// swagger:model ProductDTO
 type ProductDTO struct {
 	ID       string  `json:"id"`
 	Name     string  `json:"name"`
@@ -11,6 +12,7 @@ type ProductDTO struct {
 }
 
 // OrderItemDTO is the inline object used in Order and OrderReq
+// swagger:model OrderItemDTO
 type OrderItemDTO struct {
 	ProductID string `json:"productId"`
 	Quantity  int    `json:"quantity"`
@@ -18,6 +20,7 @@ type OrderItemDTO struct {
 
 // OrderReqDTO matches components.schema.OrderReq
 // Used for POST /order request bodies
+// swagger:model OrderReq
 type OrderReqDTO struct {
 	CouponCode *string        `json:"couponCode,omitempty"`
 	Items      []OrderItemDTO `json:"items"`
@@ -25,6 +28,7 @@ type OrderReqDTO struct {
 
 // OrderDTO matches components.schemas.Order
 // used for responses from POST /order (and potentially GET /order in future)
+// swagger:model Order
 type OrderDTO struct {
 	ID         string         `json:"id"`
 	Items      []OrderItemDTO `json:"items"`
@@ -33,6 +37,7 @@ type OrderDTO struct {
 }
 
 // ApiResponseDTO matches components.schemas.ApiResponse
+// swagger:model ApiResponse
 type ApiResponseDTO struct {
 	Code    int    `json:"code"`
 	Type    string `json:"type"`

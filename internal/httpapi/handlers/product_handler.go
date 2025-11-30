@@ -25,6 +25,13 @@ func NewProductHandler(productSvc service.ProductService) *ProductHandler {
 }
 
 // ListProducts handles GET /product.
+//
+// @Summary List products
+// @Description Get all products available for order
+// @Tags product
+// @Produce json
+// @Success 200 {array} api.ProductDTO
+// @Router /product [get]
 func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := zerolog.Ctx(ctx)
@@ -41,6 +48,16 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetProductByID handles GET /product/{productId}
+//
+// @Summary Find product by ID
+// @Description Returns a single product
+// @Tags product
+// @Produce json
+// @Param productId path int true "ID of product to return"
+// @Success 200 {object} api.ProductDTO
+// @Failure 400 {object} shared.ErrorResponse
+// @Failure 404 {object} shared.ErrorResponse
+// @Router /product/{productId} [get]
 func (h *ProductHandler) GetProductByID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := zerolog.Ctx(ctx)

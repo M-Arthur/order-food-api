@@ -15,6 +15,14 @@ import (
 	"github.com/M-Arthur/order-food-api/internal/server"
 )
 
+// @title Order Food Online API
+// @version 1.0
+// @description This is the API server for the Order Food Online challenge.
+// @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name api_key
 func main() {
 	// 1) Init logger
 	cfg := config.Load()

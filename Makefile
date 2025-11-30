@@ -15,3 +15,7 @@ tidy:
 
 lint:
 	golangci-lint run
+
+# Generate/open API docs using swag (install binary if needed)
+swag:
+	swag init -g cmd/server/main.go -o docs --parseGoList=false

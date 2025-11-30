@@ -26,6 +26,18 @@ func NewOrderHandler(orderSvc service.OrderService) *OrderHandler {
 //
 // Promo code validation will be added later; for now, we accept couponCode
 // but only validate shape / items.
+//
+//	@Summary		Place an order
+//	@Description	Place a new order in the store
+//	@Tags			order
+//	@Accept		json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param order body api.OrderReqDTO true "Order request"
+//	@Success		200 {object} api.OrderDTO
+//	@Failure		400 {object} shared.ErrorResponse
+//	@Failure		422 {object} shared.ErrorResponse
+//	@Router		 /order [post]
 func (h *OrderHandler) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := zerolog.Ctx(ctx)
