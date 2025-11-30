@@ -106,7 +106,7 @@ func (r *PgProductRepository) GetProductByIDs(ctx context.Context, ids []domain.
 	}
 
 	const query = `
-		SELECT id, name, price_cents, categroy
+		SELECT id, name, price_cents, category
 		FROM products
 		WHERE id = ANY($1)
 	`

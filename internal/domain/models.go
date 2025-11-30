@@ -76,10 +76,6 @@ func NewOrder(id OrderID, items []OrderItem, couponCode *string) (*Order, error)
 		}
 	}
 
-	if couponCode != nil && *couponCode == "" {
-		return nil, ErrInvalidCouponCode
-	}
-
 	itemsCopy := make([]OrderItem, len(items))
 	copy(itemsCopy, items)
 
