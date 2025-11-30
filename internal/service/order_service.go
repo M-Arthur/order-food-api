@@ -49,7 +49,7 @@ func (s *orderService) CreateOrder(
 	// 3. Ensure all products exist
 	for _, item := range items {
 		if _, ok := productsByID[item.ProductID]; !ok {
-			return nil, nil, fmt.Errorf("product %s does not exist: %w", item.ProductID, err)
+			return nil, nil, fmt.Errorf("product %s does not exist: %w", item.ProductID, domain.ErrProductNotFound)
 		}
 	}
 
