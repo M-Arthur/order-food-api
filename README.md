@@ -6,7 +6,7 @@ It aims to look and behave like a small production service:
 
 - HTTP API for **products**, **orders**, and **health**
 - **PostgreSQL** persistence (orders/order items, products)
-- **Promo code** processing pipeline + validation
+- **Promo code** extraction pipeline (validation logic intentionally left undefined)
 - Clean, layered architecture (HTTP → service → storage → DB)
 - **OpenAPI/Swagger** docs generated from code
 - **Docker Compose** environment (API + Postgres) for easy review
@@ -259,6 +259,11 @@ This is implemented as a separate CLI tool: `cmd/promo-loader`.
 - Writes all codes that meet the criteria into `valid_promo_codes.txt`.
 
 The API loads this file at startup and uses it to validate the `couponCode` in orders.
+However, the original challenge API documentation does not clearly describe **how** promo codes
+should affect pricing or responses. For that reason, **no HTTP-level promo validation or discount
+logic is implemented** in this project. The extracted codes are available in
+`valid_promo_codes.txt` and can be wired into validation/discount rules if the specification is
+extended in the future.
 
 ### 5.2 How to run it
 
@@ -363,8 +368,14 @@ This section briefly connects the implementation back to the challenge requireme
 - **Requirement:** handle very large promo datasets and apply them to orders.
 - **Implementation:**
   - `cmd/promo-loader` for scalable preprocessing of `.gz` files.
-  - Output `valid_promo_codes.txt` is used by the API at startup.
-  - Orders with `couponCode` are checked against this set.
+  - Output `valid_promo_codes.txt` contains the set of valid coupon codes extracted from the
+    large input files.
+  - The existing public API documentation for the challenge does not clearly define how promo
+    codes should influence order pricing or responses, nor the exact validation flow. Because of
+    this, **this solution does not implement a concrete promo validation/discount feature in the
+    HTTP API**.
+  - Instead, `valid_promo_codes.txt` is produced and ready to be consumed by a future validation
+    layer or pricing engine once the business rules are clarified.
 
 ### 7.4 Persistence & DB
 
