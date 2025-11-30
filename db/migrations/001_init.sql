@@ -45,11 +45,15 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items (order_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items (product_id);
 
 INSERT INTO products (id, name, price_cents, category) VALUES
-('10', 'Chicken Waffle', 1250, 'Waffle'),
-('11', 'Fries', 550, 'Sides'),
-('12', 'Soda', 300, 'Beverages'),
-('13', 'Burger', 1500, 'Main Course'),
-('14', 'Salad', 800, 'Appetizers');
+('1', 'Waffle with Berries', 650, 'Waffle'),
+('2', 'Vanilla Bean Crème Brûlée', 700, 'Crème Brûlée'),
+('3', 'Macaron Mix of Five', 800, 'Macaron'),
+('4', 'Classic Tiramisu', 550, 'Tiramisu'),
+('5', 'Pistachio Baklava', 400, 'Baklava'),
+('6', 'Lemon Meringue Pie', 500, 'Pie'),
+('7', 'Red Velvet Cake', 450, 'Cake'),
+('8', 'Salted Caramel Brownie', 450, 'Brownie'),
+('9', 'Vanilla Panna Cotta', 650, 'Panna Cotta');
 -- Optional: seed data example (remove if you don't want sample rows)
 -- INSERT INTO orders (id, coupon_code) VALUES ('order-seed-1', NULL);
 -- INSERT INTO order_items (order_id, product_id, quantity)
