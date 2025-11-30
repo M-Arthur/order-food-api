@@ -155,6 +155,68 @@ func TestMapDomainOrderToDTO(t *testing.T) {
 		t.Errorf("dto.ID = %s, want %s", dto.ID, order.ID)
 	}
 
+	if dto.CouponCode != "" {
+		t.Errorf("dto.CouponCode = %s, want empty", dto.CouponCode)
+	}
+
+	if len(dto.Items) != len(order.Items) {
+		t.Fatalf("dto.Items len = %d, want %d", len(dto.Items), len(order.Items))
+	}
+	for i, item := range dto.Items {
+		want := order.Items[i]
+		if item.ProductID != string(want.ProductID) {
+			t.Errorf("item[%d].ProductID = %s, want %s", i, item.ProductID, want.ProductID)
+		}
+		if item.Quantity != want.Quantity {
+			t.Errorf("item[%d].Quantity = %d, want %d", i, item.Quantity, want.Quantity)
+		}
+	}
+
+	if len(dto.Products) != len(products) {
+		t.Errorf("dto.Products len = %d, want %d", len(dto.Products), len(products))
+	}
+	for i, p := range dto.Products {
+		want := products[i]
+		if p.ID != string(want.ID) {
+			t.Errorf("products[%d].ID = %s, want %s", i, p.ID, want.ID)
+		}
+		if p.Name != want.Name {
+			t.Errorf("products[%d].Name = %s, want %s", i, p.Name, want.Name)
+		}
+		if p.Category != want.Category {
+			t.Errorf("products[%d].Category = %s, want %s", i, p.Category, want.Category)
+		}
+		if p.Price != want.Price.ToFloat() {
+			t.Errorf("products[%d].Price = %v, want %v", i, p.Price, want.Price.ToFloat())
+		}
+	}
+}
+
+func TestMapDomainOrderToDTO_ReturnCouponCode(t *testing.T) {
+	order := &domain.Order{
+		ID: "order-123",
+		Items: []domain.OrderItem{
+			{ProductID: "10", Quantity: 2},
+			{ProductID: "11", Quantity: 3},
+		},
+		CouponCode: ptr("RPOMO10"),
+	}
+
+	products := []domain.Product{
+		{ID: "10", Name: "Chicken Waffle", Price: domain.NewMoneyFromFloat(12.0), Category: "Waffle"},
+		{ID: "11", Name: "Fries", Price: domain.NewMoneyFromFloat(5.5), Category: "Sides"},
+	}
+
+	dto := api.MapDomainOrderToDTO(order, products)
+
+	if dto.ID != string(order.ID) {
+		t.Errorf("dto.ID = %s, want %s", dto.ID, order.ID)
+	}
+
+	if dto.CouponCode != *order.CouponCode {
+		t.Errorf("dto.CouponCode = %s, want %s", dto.CouponCode, *order.CouponCode)
+	}
+
 	if len(dto.Items) != len(order.Items) {
 		t.Fatalf("dto.Items len = %d, want %d", len(dto.Items), len(order.Items))
 	}

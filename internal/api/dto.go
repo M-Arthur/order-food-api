@@ -26,9 +26,10 @@ type OrderReqDTO struct {
 // OrderDTO matches components.schemas.Order
 // used for responses from POST /order (and potentially GET /order in future)
 type OrderDTO struct {
-	ID       string         `json:"id"`
-	Items    []OrderItemDTO `json:"items"`
-	Products []ProductDTO   `json:"products"`
+	ID         string         `json:"id"`
+	Items      []OrderItemDTO `json:"items"`
+	Products   []ProductDTO   `json:"products"`
+	CouponCode string         `json:"couponCode"`
 }
 
 // ApiResponseDTO matches components.schemas.ApiResponse

@@ -81,9 +81,15 @@ func MapDomainOrderToDTO(order *domain.Order, products []domain.Product) OrderDT
 		})
 	}
 
+	couponCode := ""
+	if order.CouponCode != nil {
+		couponCode = *order.CouponCode
+	}
+
 	return OrderDTO{
-		ID:       string(order.ID),
-		Items:    itemDTOs,
-		Products: MapDomainProductsToDTO(products),
+		ID:         string(order.ID),
+		Items:      itemDTOs,
+		Products:   MapDomainProductsToDTO(products),
+		CouponCode: couponCode,
 	}
 }

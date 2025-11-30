@@ -47,7 +47,9 @@ func (h *OrderHandler) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// fallback
+		logger.Error().Err(err).Msg("internal server eror")
 		shared.WriteJSONError(w, r, http.StatusInternalServerError, "internal server error")
+		return
 	}
 
 	orders, products, err := h.orderSvc.CreateOrder(ctx, payload.Items, payload.CouponCode)
@@ -55,8 +57,10 @@ func (h *OrderHandler) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, domain.ErrProductNotFound) {
 			logger.Warn().Err(err).Msg("unknown product in order items")
 			shared.WriteJSONError(w, r, http.StatusBadRequest, "invalid product in items")
+			return
 		}
 
+		logger.Error().Err(err).Msg("internal server eror")
 		shared.WriteJSONError(w, r, http.StatusInternalServerError, "internal server error")
 		return
 	}

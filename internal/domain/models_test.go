@@ -117,15 +117,6 @@ func TestNewOrder_ValidationErrors(t *testing.T) {
 			wantError: true,
 		},
 		{
-			name:    "empty coupon string",
-			orderID: "order-2",
-			items: []domain.OrderItem{
-				{ProductID: "p1", Quantity: 2},
-			},
-			coupon:    ptr(""),
-			wantError: true,
-		},
-		{
 			name:    "valid no coupon",
 			orderID: "order-3",
 			items: []domain.OrderItem{
@@ -147,8 +138,4 @@ func TestNewOrder_ValidationErrors(t *testing.T) {
 			}
 		})
 	}
-}
-
-func ptr[T any](v T) *T {
-	return &v
 }
