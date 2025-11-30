@@ -1,0 +1,136 @@
+basePath: /
+definitions:
+  api.OrderDTO:
+    properties:
+      couponCode:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/api.OrderItemDTO'
+        type: array
+      products:
+        items:
+          $ref: '#/definitions/api.ProductDTO'
+        type: array
+    type: object
+  api.OrderItemDTO:
+    properties:
+      productId:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  api.OrderReqDTO:
+    properties:
+      couponCode:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/api.OrderItemDTO'
+        type: array
+    type: object
+  api.ProductDTO:
+    description: Product model
+    properties:
+      category:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  shared.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is the API server for the Order Food Online challenge.
+  title: Order Food Online API
+  version: "1.0"
+paths:
+  /order:
+    post:
+      consumes:
+      - application/json
+      description: Place a new order in the store
+      parameters:
+      - description: Order request
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/api.OrderReqDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.OrderDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shared.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/shared.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Place an order
+      tags:
+      - order
+  /product:
+    get:
+      description: Get all products available for order
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.ProductDTO'
+            type: array
+      summary: List products
+      tags:
+      - product
+  /product/{productId}:
+    get:
+      description: Returns a single product
+      parameters:
+      - description: ID of product to return
+        in: path
+        name: productId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.ProductDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/shared.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/shared.ErrorResponse'
+      summary: Find product by ID
+      tags:
+      - product
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: api_key
+    type: apiKey
+swagger: "2.0"

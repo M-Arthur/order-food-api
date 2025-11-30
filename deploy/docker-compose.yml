@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: orderfood_db
+    environment:
+      POSTGRES_DB: orderfood
+      POSTGRES_USER: orderfood_user
+      POSTGRES_PASSWORD: orderfood_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - orderfood_pgdata:/var/lib/postgresql/data
+      - ../db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orderfood_user -d orderfood"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    networks:
+      - orderfood
+
+  api:
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+    container_name: orderfood_api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # DB connection string used in the application
+      # In PROD the values will be fetched from a secure source
+      DB_DSN: postgres://orderfood_user:orderfood_pass@db:5432/orderfood?sslmode=disable
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - orderfood
+
+networks:
+  orderfood:
+
+volumes:
+  orderfood_pgdata:
