@@ -30,6 +30,7 @@ services:
         condition: service_healthy
     environment:
       # DB connection string used in the application
+      # In PROD the values will be fetched from a secure source
       DB_DSN: postgres://orderfood_user:orderfood_pass@db:5432/orderfood?sslmode=disable
       PORT: 8080
     ports:

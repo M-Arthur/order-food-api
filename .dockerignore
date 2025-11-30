@@ -67,3 +67,4 @@ coverage.out
 hooks/
 deploy/
 README.md
+tmp/
